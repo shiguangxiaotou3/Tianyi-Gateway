@@ -2,7 +2,6 @@ import requests
 import json
 import re
 
-
 class network:
     def __init__(self, username, password, ip='192.168.1.1'):
         self.url = 'http://' + ip
@@ -42,10 +41,11 @@ class network:
                                      allow_redirects=False)
 
     def network_reboot(self):
-        response = requests.post(self.url + '/cgi-bin/luci/admin/reboot', data={'token': self.token},
-                                 allow_redirects=False)
-        print(response.text)
-        return json.loads(response.text)
+        if self.login_success:
+            response = requests.post(self.url + '/cgi-bin/luci/admin/reboot', data={'token': self.token},
+                                     allow_redirects=False)
+            print(response.text)
+            return json.loads(response.text)
 
     def get_device_list(self):
         """获取联网设备"""
@@ -73,70 +73,77 @@ class network:
 
     def on_mapping_record(self, srvname):
         """开启端口映射"""
-        data = {
-            "token": self.token,
-            "op": "enable",
-            "srvname": srvname
-        }
-        response = requests.post(self.url + "/cgi-bin/luci/admin/settings/pmSetSingle", data=data, cookies=self.cookies)
+        if self.login_success:
+            data = {
+                "token": self.token,
+                "op": "enable",
+                "srvname": srvname
+            }
+            response = requests.post(self.url + "/cgi-bin/luci/admin/settings/pmSetSingle", data=data, cookies=self.cookies)
         return json.loads(response.text)
 
     def off_mapping_record(self, srvname):
         """关闭端口映射"""
-        data = {
-            "token": self.token,
-            "op": "disable",
-            "srvname": srvname
-        }
-        response = requests.post(self.url + "/cgi-bin/luci/admin/settings/pmSetSingle", data=data, cookies=self.cookies)
+        if self.login_success:
+            data = {
+                "token": self.token,
+                "op": "disable",
+                "srvname": srvname
+            }
+            response = requests.post(self.url + "/cgi-bin/luci/admin/settings/pmSetSingle", data=data, cookies=self.cookies)
         return json.loads(response.text)
 
     def del_mapping_record(self, srvname):
         """先增端口映射"""
-        data = {
-            "token": self.token,
-            "op": "del"
-        }
-        response = requests.post(self.url + "/cgi-bin/luci/admin/settings/pmSetSingle", data=data, cookies=self.cookies)
+        if self.login_success:
+            data = {
+                "token": self.token,
+                "op": "del"
+            }
+            response = requests.post(self.url + "/cgi-bin/luci/admin/settings/pmSetSingle", data=data, cookies=self.cookies)
         return json.loads(response.text)
 
     def on_mapping_record_all(self):
         """开启全部端口映射"""
-        data = {
-            "token": self.token,
-            "op": "enable"
-        }
-        requests.post(self.url + "/cgi-bin/luci/admin/settings/pmSetAll", data=data, cookies=self.cookies)
+        if self.login_success:
+            data = {
+                "token": self.token,
+                "op": "enable"
+            }
+            requests.post(self.url + "/cgi-bin/luci/admin/settings/pmSetAll", data=data, cookies=self.cookies)
 
     def off_mapping_record_all(self):
         """关闭全部端口映射"""
-        data = {
-            "token": self.token,
-            "op": "disable"
-        }
-        requests.post(self.url + "/cgi-bin/luci/admin/settings/pmSetAll", data=data, cookies=self.cookies)
+        if self.login_success:
+            data = {
+                "token": self.token,
+                "op": "disable"
+            }
+            requests.post(self.url + "/cgi-bin/luci/admin/settings/pmSetAll", data=data, cookies=self.cookies)
 
     def del_mapping_record_all(self):
         """删除端口映射"""
-        data = {
-            "token": self.token,
-            "op": "del"
-        }
-        requests.post(self.url + "/cgi-bin/luci/admin/settings/pmSetAll", data=data, cookies=self.cookies)
+        if self.login_success:
+            data = {
+                "token": self.token,
+                "op": "del"
+            }
+            requests.post(self.url + "/cgi-bin/luci/admin/settings/pmSetAll", data=data, cookies=self.cookies)
 
     def add_mapping_record(self, srvname, internal_ip, ex_port, in_port, protocol='TCP'):
         """新增端口映射"""
-        data = {
-            "token": self.token,
-            "op": "add",
-            "srvname": srvname,
-            "client": internal_ip,
-            "protocol": protocol,
-            "exPort": ex_port,
-            "inPort": in_port
-        }
-        response = requests.post(self.url + "/cgi-bin/luci/admin/settings/pmSetSingle", data=data, cookies=self.cookies)
-        return json.loads(response.text)
+        if self.login_success:
+            data = {
+                "token": self.token,
+                "op": "add",
+                "srvname": srvname,
+                "client": internal_ip,
+                "protocol": protocol,
+                "exPort": ex_port,
+                "inPort": in_port
+            }
+            response = requests.post(self.url + "/cgi-bin/luci/admin/settings/pmSetSingle", data=data, cookies=self.cookies)
+            return json.loads(response.text)
 
     def get_network_status(self):
         """获取网关运行状态"""
@@ -198,9 +205,10 @@ class network:
             return json.loads(response.text)
 
     def get_public_ip(self):
-        """获取公网ip"""
-        data = self.get_network_info()
-        if data['WANIP']:
-            return data['WANIP']
-        else:
-            return None
+        if self.login_success:
+            """获取公网ip"""
+            data = self.get_network_info()
+            if data['WANIP']:
+                return data['WANIP']
+            else:
+                return None
