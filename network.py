@@ -204,6 +204,3 @@ class network:
             return data['WANIP']
         else:
             return None
-
-    def __del__(self):
-        self.logout()
