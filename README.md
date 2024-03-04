@@ -27,4 +27,5 @@ print(net.network_timed_start( 1, "6:00", "23:30")
 print(net.update_wifi_config( "wifi-name", "pwssword"))
 # 重启
 net.network_reboot()
+net.logout()
 ```
