@@ -37,10 +37,9 @@ class network:
             return False
 
     def logout(self):
-        response = requests.post(self.url + '/cgi-bin/luci/admin/logout', data={'token': self.token},
-                                 allow_redirects=False)
-        print(response.text)
-        return json.loads(response.text)
+        if self.login_success:
+            response = requests.post(self.url + '/cgi-bin/luci/admin/logout', data={'token': self.token},
+                                     allow_redirects=False)
 
     def network_reboot(self):
         response = requests.post(self.url + '/cgi-bin/luci/admin/reboot', data={'token': self.token},
@@ -205,3 +204,6 @@ class network:
             return data['WANIP']
         else:
             return None
+
+    def __del__(self):
+        self.logout()
